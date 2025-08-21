@@ -1,0 +1,70 @@
+{
+  "name": "007/recipe-planner-tool",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -140,
+        40
+      ],
+      "id": "34007115-123b-47b4-b939-aed4f0e80eba",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "collection": "=recipe",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        40
+      ],
+      "id": "85120235-71af-4bc5-a33a-3e74b7de272c",
+      "name": "MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "yng9YLlgQTgEFRjz",
+          "name": "007"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "recipe"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "09dac3c2-ba0f-4673-b464-bb4b5201105b",
+  "meta": {
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "gPsBdAMKqkINo3gX",
+  "tags": []
+}

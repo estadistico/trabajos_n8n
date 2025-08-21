@@ -1,0 +1,223 @@
+{
+  "name": "004/personal-trainer",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.data.session_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        720,
+        200
+      ],
+      "id": "3d7e7260-58ec-4627-b184-761acf3ae014",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "lSXjB9Q2iQNe3nJW",
+          "name": "004"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un agente que puede consultar una base de datos. \na esta tool tenes que pasarle este nombre especifico:\n  \n  {{ $json.body.data.mongo_collection }}\n  \nUsuario dice: \"{{ $json.body.data.chat_input }}\"\n",
+        "options": {
+          "systemMessage": "={{ $json.body.data.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -20
+      ],
+      "id": "99ab7734-562d-49f7-8e59-f1c0cf912a35",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "description": "llama a edsta tool para dar ejercicios de gym ",
+        "workflowId": {
+          "__rl": true,
+          "value": "V75g9Gx6vYHlrpec",
+          "mode": "list",
+          "cachedResultName": "db_004"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        940,
+        200
+      ],
+      "id": "9aa7cb9f-c0a5-47ba-8f1d-8875e01cca39",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "entrenador_personal_004",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        380,
+        -20
+      ],
+      "id": "8691aa39-2f38-4d38-9be0-e569ec5ae691",
+      "name": "Webhook",
+      "webhookId": "1ec45568-5b52-4e2f-bddb-72b463509307"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        280,
+        180
+      ],
+      "id": "edd2b6eb-7817-4ade-ad2e-46c5e6b09657",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        480,
+        180
+      ],
+      "id": "b29f4d5b-567d-4221-b6b5-29f11fdcfbea",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-length": "541",
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "content-type": "application/json",
+            "host": "192.168.1.34:5680",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "004",
+              "view_name": "Entrenador_personal_inteligente",
+              "n_token": 2,
+              "chat_input": "quieor una rutina de hombro",
+              "mongo_collection": "Entrenador_personal_inteligente",
+              "session_id": 11111118,
+              "system_prompt": "Eres un entrenador personal inteligente, motivador y altamente profesional. Proporcionas solamente rutinas de entrenamiento,a las necesidades del usuario."
+            }
+          },
+          "webhookUrl": "http://localhost:5680/webhook/entrenador_personal_004",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "11460d98-8495-4574-bb31-eb5f24c77f69",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "H0H9VALu8d6UX4Ay",
+  "tags": []
+}

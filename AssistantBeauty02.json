@@ -1,0 +1,225 @@
+{
+  "name": "002/beauty-assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.data.session_id }}",
+        "collectionName": "dataAIBeautyAssistantChatHistory",
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        100,
+        220
+      ],
+      "id": "8bf8d7dd-64d0-4f51-b2a0-4d6c317ad712",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "jfOsQyqfBIKKhvnu",
+          "name": "002"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un agente que puede consultar una base de datos. \na esta tool tenes que pasarle este nombre especifico, solo en nombre, mas nada:\n  \n  {{ $json.body.data.mongo_collection }}\n  \nUsuario dice: \"{{ $json.body.data.chat_input }}\"\n",
+        "options": {
+          "systemMessage": "={{ $json.body.data.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        60,
+        0
+      ],
+      "id": "d5a6836f-92df-4518-bd01-b81c42bcb228",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "description": "llama a esta tool para dar recomendaciones de productos ",
+        "workflowId": {
+          "__rl": true,
+          "value": "xGHfqe7GmnJHjeFP",
+          "mode": "list",
+          "cachedResultName": "002/beauty-assistant-tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        180
+      ],
+      "id": "360675c2-5368-448c-9f80-14d9afd36016",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "002/beauty-assistant",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        0
+      ],
+      "id": "07f41a6d-9641-43c9-b0df-22340575e90b",
+      "name": "Webhook",
+      "webhookId": "1ec45568-5b52-4e2f-bddb-72b463509307"
+    },
+    {
+      "parameters": {
+        "model": "=qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        220
+      ],
+      "id": "55ed39c0-d8fa-41ab-9db0-12905a41fa82",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        220
+      ],
+      "id": "378b07fc-9f60-4cf9-b15d-5046316beece",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-length": "577",
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "content-type": "application/json",
+            "host": "192.168.1.24:5678",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "002",
+              "view_name": "beauty-assistant",
+              "n_token": 2,
+              "chat_input": "tengo la barba seca, que me recomendas para mejorar la sequedad?",
+              "mongo_collection": "cosmetics",
+              "session_id": 11111117,
+              "system_prompt": "Eres un asistente de belleza que proporciona recomendaciones al usuario dadas sus caracteristicas, revisando una base de datos de productos"
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/002/beauty-assistant",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9248c32a-3872-4a2e-a39c-a372f26344c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "YuE5lc93lsABjSlV",
+  "tags": []
+}

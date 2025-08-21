@@ -1,0 +1,225 @@
+{
+  "name": "007/recipe-planner",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.data.session_id }}",
+        "collectionName": "dataAIRecipePlannerChatHistory",
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        60,
+        80
+      ],
+      "id": "ee27e70b-3a66-4841-935a-15294b67d34a",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "yng9YLlgQTgEFRjz",
+          "name": "007"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un agente que puede consultar una base de datos. \na esta tool tenes que pasarle este nombre especifico:\n  \n  {{ $json.body.data.mongo_collection }}\n  \nUsuario dice: \"{{ $json.body.data.chat_input }}\"\n",
+        "options": {
+          "systemMessage": "={{ $json.body.data.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -140
+      ],
+      "id": "ecad53a3-2005-4dc5-8555-99d80bcd4537",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "description": "llama a esta tool para dar generar un plan de comidas",
+        "workflowId": {
+          "__rl": true,
+          "value": "gPsBdAMKqkINo3gX",
+          "mode": "list",
+          "cachedResultName": "007/recipe-planner-tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        80
+      ],
+      "id": "f3e56c9e-2e55-4e32-b52c-a37966c01435",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "007/recipe-planner",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -140
+      ],
+      "id": "63872d64-834f-4425-abd2-a4d1ae6544bb",
+      "name": "Webhook",
+      "webhookId": "1ec45568-5b52-4e2f-bddb-72b463509307"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        80
+      ],
+      "id": "c06ae6ed-1534-4a6f-ba95-3ef453e9806d",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        80
+      ],
+      "id": "b2157d18-9df6-4b59-b57e-a9b0f5cb407f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-length": "541",
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "content-type": "application/json",
+            "host": "192.168.1.34:5680",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "007",
+              "view_name": "recipe-planner",
+              "n_token": 2,
+              "chat_input": "quiero un plan de alimentacion para subir de peso, no tengo restriccion es de gusto, que el plan sea de 1 dia",
+              "mongo_collection": "recipe",
+              "session_id": 11111118,
+              "system_prompt": "Eres un asistente de planificación nutricional inteligente. El usuario te indicará sus objetivos nutricionales, número de días a planificar y, opcionalmente, ingredientes disponibles y preferencias alimentarias (por ejemplo, alergias o intolerancias).Tu tarea es generar un plan de comidas semanal utilizando una base de conocimiento con recetas que incluyen:nombre de la receta información nutricional (calorías, proteínas, carbohidratos, grasas, sodio)objetivos nutricionales asociados (por ejemplo: perder peso, dieta baja en sodio, aumentar masa muscular,)ingredientes,tiempo de preparación,etiquetas como vegano, sin lactosa, bajo en carbohidratos Formato de entrada del usuario: Objetivo nutricional: perder peso Días a planificar: 5 Ingredientes disponibles: pollo, brócoli, arroz integral Preferencias o restricciones: sin lactosa Tu respuesta debe ser un plan semanal estructurado como una lista de recetas por día. Por ejemplo: Día 1 Desayuno: Wrap vegetariano de hummus Almuerzo: Ensalada de pollo y brócoli Cena: Arroz integral con verduras salteadas Repite esto para cada día solicitado. Prioriza recetas que coincidan con el objetivo nutricional y respeten las preferencias del usuario. Evita repetir recetas si hay suficientes opciones."
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/007/recipe-planner",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3742956f-e685-47bd-98c3-a0f554065405",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "b6iauyraoeidthUV",
+  "tags": []
+}

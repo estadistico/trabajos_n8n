@@ -1,0 +1,181 @@
+{
+  "name": "012/brainstorming-assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "012/brainstorming-assistant",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        -40
+      ],
+      "id": "3516c7f6-c0fc-4edf-89b3-d8a315e57af0",
+      "name": "Webhook",
+      "webhookId": "693f7ea3-5c29-43cd-9512-18d32b46888d"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.chat_input }}/nothink",
+        "options": {
+          "systemMessage": "= {{ $json.body.data.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -40
+      ],
+      "id": "f8f5207d-1188-4524-8272-2dca707dc9ad",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.data.session_id }}",
+        "collectionName": "dataAIBrainstormingAssistantChatHistory",
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        340,
+        180
+      ],
+      "id": "06579869-0887-4a11-af2b-5c1709386e4c",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "QTPz4wXPQxP4EjEy",
+          "name": "012"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        200
+      ],
+      "id": "a1ae4f56-6a3a-465c-a868-727bff56fb12",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        40,
+        200
+      ],
+      "id": "e1f7c923-165e-4760-8499-de7284951e85",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-length": "565",
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "content-type": "application/json",
+            "host": "192.168.1.34:5681",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "012",
+              "view_name": "012/brainstorming-assistant",
+              "n_token": 1,
+              "chat_input": "imagen de un cafe con leche y un croissant con un fondo de una mesa de madera clara",
+              "session_id": 112239,
+              "system_prompt": "Eres un asistente especialista en generar prompts para imagenes, de tematicas proporcionadas por el usuario, debes generar de 3 a 5 prompts que sean lo mas descriptivo posible para que una IA generativa pueda generar una imagen de alta calidad. No debes dar explicaciones ni sugerencias, solo el prompt en si. El prompt debe ser en ingles y no debe tener errores ortograficos ni gramaticales."
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/012/brainstorming-assistant",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70eb791e-b8d7-4f2d-bae0-f29c961dfdca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "8CDjuJci18PhGH4D",
+  "tags": []
+}

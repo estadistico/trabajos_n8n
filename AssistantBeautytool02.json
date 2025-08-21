@@ -1,0 +1,95 @@
+{
+  "name": "002/beauty-assistant-tool",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        60
+      ],
+      "id": "cf106cc1-30c3-4f88-978f-90d16d2b8c7d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "collection": "cosmetics",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        60
+      ],
+      "id": "45abd517-14d1-4e30-90cc-1d46351b65bd",
+      "name": "MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "jfOsQyqfBIKKhvnu",
+          "name": "002"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const {\n    cosName,\n    cosPrice,\n    cosCategory,\n    cosSubcategory,\n    cosSkinTipe,\n    cosDescription,\n    cosBrand\n  } = item.json;\n\n  return {\n    json: {\n      cosName,\n      cosPrice,\n      cosCategory,\n      cosSubcategory,\n      cosSkinTipe,\n      cosDescription,\n      cosBrand\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        60
+      ],
+      "id": "3b862b69-fe39-47a0-8167-b64e4fba752e",
+      "name": "Code"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "cosmetics"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8410b19c-78c0-4d2e-ad4e-8d495b71c3d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "xGHfqe7GmnJHjeFP",
+  "tags": []
+}

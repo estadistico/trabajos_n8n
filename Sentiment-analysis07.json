@@ -1,0 +1,151 @@
+{
+  "name": "011/sentiment-analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "011/sentiment-analysis",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "1958ae14-6ad2-483c-9981-10d9f1d3e078",
+      "name": "Webhook",
+      "webhookId": "a1b1547c-f3e8-4994-b0c8-2f04874535a1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.chat_input }}/nothink",
+        "options": {
+          "systemMessage": "={{ $json.body.data.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2333e018-d00b-479b-88f3-673498f2ccb9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ],
+      "id": "167f3688-bf31-4a70-894a-0409d4a12f3e",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        220
+      ],
+      "id": "76e2573b-383e-4654-b422-42d46a0b0aac",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "host": "192.168.1.34:5678",
+            "connection": "close",
+            "content-length": "0"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "",
+              "view_name": "",
+              "n_token": 1,
+              "chat_input": "Últimamente me siento muy ansioso y tengo dificultades para dormir. Además, siento que mi productividad en el trabajo ha disminuido.",
+              "system_prompt": "sos un chat que analisa el sentimiento de una frase proporcionada por el usuario, responde con el sentimiento (negativo o positivo).  Sea un sentimiento negativo o positivo redactará un informe muy breve identificando los hallazgos relevantes. Ejemplo:  Negativo: Se detecta un sentimiento fuertemente negativo o palabras clave que indiquen un riesgo de 'burnout' o estrés severo en el empleado inicia la frase con ekl sentimiento como en el ejemplo, sin excepciones"
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/011/sentiment-analysis",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ca4b164-14b9-46f4-81d5-c621aa1b69ff",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "pSpfty6qhoIFtQCY",
+  "tags": []
+}

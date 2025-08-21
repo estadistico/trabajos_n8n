@@ -1,0 +1,150 @@
+{
+  "name": "005/smart-summarizer-tool",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -60,
+        -40
+      ],
+      "id": "4fb45741-1de4-4a94-bc31-d7357b3892a2",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -40
+      ],
+      "id": "78190c9a-a3d3-41b4-af27-899643a4385f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c91c1ad5-fd20-4fee-bd49-9d0e18fefa37",
+              "leftValue": "={{ $json._p_revCateringSuppliersId }}",
+              "rightValue": "={{ $('Edit Fields').item.json.proveedor }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        -40
+      ],
+      "id": "d569153f-bd18-4faf-bec9-fa567ebf45d3",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "collection": "reviews",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        -40
+      ],
+      "id": "dbf1a12b-89b4-4f79-92d3-79b49e717034",
+      "name": "MongoDB",
+      "credentials": {
+        "mongoDb": {
+          "id": "hpdDEWAbTOYaG2WO",
+          "name": "005"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "{'collection': 'reviews', 'proveedor': '_User$PLjmuR4SrA'}"
+        }
+      }
+    ],
+    "Edit Fields": [
+      {
+        "json": {
+          "collection": "reviews",
+          "proveedor": "_User$PLjmuR4SrA"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "be28a7e7-0e03-4c4e-acb5-3bce37c23fdb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "bkqjVsaxVFumqoME",
+  "tags": []
+}

@@ -1,0 +1,190 @@
+{
+  "name": "001/smart-concierge",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.chat_input }} /nothink",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -100
+      ],
+      "id": "edb75362-32e1-4fcc-bbd8-7bfd17ec9977",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.data.session_id }}",
+        "collectionName": "dataAISmartConciergeChatHistory",
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        120
+      ],
+      "id": "73d61766-ee81-4547-ae5f-cea261deb6ce",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "jVJOkc61iYWqZP4T",
+          "name": "001"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        120
+      ],
+      "id": "5064d720-53d2-40b4-b6a3-2cc6620ab2d4",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "001/smart-concierge",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        -100
+      ],
+      "id": "26e4a511-775d-4d89-8e1f-a9d18c517fd3",
+      "name": "Webhook",
+      "webhookId": "69931967-87ee-4b22-8fb5-fa68b1ce48b2"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        120
+      ],
+      "id": "ce165caa-9bae-4e4a-aa7c-0d0d6bb0cdbe",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-length": "391",
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "content-type": "application/json",
+            "host": "192.168.1.24:5678",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "001",
+              "view_name": "conserje_inteligente",
+              "n_token": 2,
+              "chat_input": "Hola estoy en madrid quiero un itinerario de vida nocturna para los siguientes 3 dias",
+              "session_id": 11111111
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/conserje_inteligente",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4822f9f3-7b32-49b1-9600-d90ba0b391c0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "tNpk8Cf71HcMy5Uc",
+  "tags": [
+    {
+      "createdAt": "2025-07-11T16:31:10.136Z",
+      "updatedAt": "2025-07-11T16:31:10.136Z",
+      "id": "Ghg6O514hHVSlatJ",
+      "name": "001 Conserje Inteligente"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "name": "005/smart-summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.data.session_id }}",
+        "collectionName": "dataIASmartSummarizerChatHistory",
+        "databaseName": "test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        240,
+        160
+      ],
+      "id": "ee329393-53a6-4d3b-bea1-79ab4d8abcd7",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "hpdDEWAbTOYaG2WO",
+          "name": "005"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.system_prompt }}\nEres un asistente especializado en resúmenes de reseñas. \nCuando recibas una solicitud de resumen DEBES usar la herramienta \"Call_n8n_Workflow_Tool\".\nTarea: \"{{ $json.body.data.chat_input }}\"\n\nGenera EXACTAMENTE este JSON SIN NINGÚN TEXTO ADICIONAL:\n{\n  \"collection\": \"{{ $json.body.data.mongo_collection }}\",\n  \"proveedor\": \"{{ $json.body.data.provider }}\"\n}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -180
+      ],
+      "id": "993838aa-5da1-4595-a7d5-d19204ac9935",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "005/smart-summarizer",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        -180
+      ],
+      "id": "8be516c6-60c1-4e2f-b8a4-62dab817e486",
+      "name": "Webhook",
+      "webhookId": "1ec45568-5b52-4e2f-bddb-72b463509307"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        80
+      ],
+      "id": "2aded346-096e-4f00-888d-cdbcd0780ac2",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "NxOZbSMTycbzvXlC",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Usa esta herramienta CUANDO el mensaje solicite resumir opiniones o reseñas de clientes. Específicamente para proveedores de catering.",
+        "workflowId": {
+          "__rl": true,
+          "value": "bkqjVsaxVFumqoME",
+          "mode": "list",
+          "cachedResultName": "005/smart-summarizer-tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        60
+      ],
+      "id": "3327f461-108d-4e70-8db3-a60d0d39eb61",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        40
+      ],
+      "id": "09074cad-d33a-48b5-9c1f-9aa00af886a2",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "d3fJVQwSGY216tOu",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept-encoding": "gzip, deflate, br",
+            "accept": "*/*",
+            "user-agent": "Thunder Client (https://www.thunderclient.com)",
+            "host": "192.168.1.34:5678",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "uid": "backend-000",
+            "user": "backend",
+            "description": "Solicitud por parte del backend del proyecto 000",
+            "data": {
+              "id_params": "005",
+              "view_name": "smart-summarizer",
+              "n_token": 2,
+              "chat_input": "resume las opiniones encontradas en la base de datos",
+              "mongo_collection": "reviews",
+              "provider": "_User$PLjmuR4SrA",
+              "session_id": 11111130,
+              "system_prompt": "Eres un asistente que resume opiniones de los clientes de un proveedor de catering, toma todas las opiniones y hace un resumen balanceado"
+            }
+          },
+          "webhookUrl": "http://192.168.1.24:5678/webhook/005/smart-summarizer",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d953b50f-63f0-44c8-955c-b76a53503b20",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8518991afc4eb86dbcc06cef389062c2e2a2ac030e6310f8c3cef13c801630ab"
+  },
+  "id": "l1RKzCJVMHNg49j1",
+  "tags": []
+}

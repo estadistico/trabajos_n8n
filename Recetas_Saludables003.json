@@ -1,0 +1,202 @@
+{
+  "name": "004_Asistente_Recetas_Saludables",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        -100
+      ],
+      "id": "66a922ea-22b8-447d-af43-fc04de918eae",
+      "name": "When chat message received",
+      "webhookId": "7e0119c6-7bf1-4f52-8785-99a2527eb571"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput ?? $('Webhook').item?.json?.body?.chatInput ?? null }}",
+        "options": {
+          "systemMessage": "Este agente recibe una lista de ingredientes separados por comas. Primero busca en la base de datos recetas que contengan todos esos ingredientes. Si no encuentra ninguna, genera nuevas recetas usando esos ingredientes."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        900,
+        0
+      ],
+      "id": "2f94b5cc-a746-4b0a-be45-93fce62e1665",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId ?? $('Webhook').item?.json?.body?.sessionId ?? null }}\n",
+        "collectionName": "recipes_chat_history",
+        "databaseName": "=test"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        280
+      ],
+      "id": "a731a280-40f8-4144-b817-a376b7f1e552",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "BhEFqkniejWUgMVo",
+          "name": "MongoDB account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Llama a esta herramienta para generar una receta. La entrada debe ser un tuple con los ingrediente, Ejemplo [\n[\"tomate\", \"quinoa\"]",
+        "workflowId": {
+          "__rl": true,
+          "value": "i3dmYoSbNPfkb2RQ",
+          "mode": "list",
+          "cachedResultName": "004_Receta_Tools"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ingredients",
+              "displayName": "ingredients",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1260,
+        300
+      ],
+      "id": "a238af9f-9b6a-41c2-886a-11e3cf1453ba",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        740,
+        280
+      ],
+      "id": "0eaad4ad-2efa-4425-b671-7878d1e4ee5c",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "MEwbztUtkhgMA3go",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "recipes",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        540,
+        100
+      ],
+      "id": "be861d37-ecdf-4045-aa89-a28128b3329d",
+      "name": "Webhook",
+      "webhookId": "1275fa22-ca97-49cb-b4ae-e3fd277f4193"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c38ce572-520f-4919-b438-75908f85c602",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aba971b4467c89e323544d53952b095967ee819f64f9e296be6d261e340c7856"
+  },
+  "id": "JUnCOLqyVcKbsBq1",
+  "tags": []
+}
