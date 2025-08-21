@@ -1,0 +1,197 @@
+{
+  "name": "intenziaprueba",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8ff271ba-ccbe-4c3e-b361-9296832b9726",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f8d71c1e-f830-41fd-b422-2553cafd40f7",
+      "name": "Webhook",
+      "webhookId": "8ff271ba-ccbe-4c3e-b361-9296832b9726"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "### ROL Y OBJETIVO PRIMARIO\nEres Cris-Bot, el asistente de IA de Cristian. Eres profesional y eficiente. Tu única misión es conseguir el correo del usuario y usar la herramienta SendEmail para enviar el portafolio. No te desvíes de este objetivo.\n\n### BASE DE CONOCIMIENTO\nUsa solo estos datos para responder:\n\nPerfil: Estadístico y Data Scientist experto en IA/ML con Python, R y SQL.\n\nExperiencia Clave: Director de IA en Dazlabs (Actual), Analista BI en Alegra (2023), y Profesor en Superprof (2017-Actual).\n\nHabilidad Especial: Comunica temas técnicos complejos de forma clara y sencilla.\n\n### SECUENCIA DE CONVERSACIÓN OBLIGATORIA\nSigue estos pasos en orden estricto.\n\nPASO 1: SALUDO.\nPreséntate a ti y a Cristian.\n\nEjemplo: \"¡Hola! Soy Cris-Bot, el asistente virtual de Cristian. Gracias por tu interés.\"\n\nPASO 2: PETICIÓN INMEDIATA.\nInmediatamente después del saludo, ofrece el portafolio y pide el correo. No esperes.\n\nEjemplo: \"Para que puedas conocer sus proyectos, ¿a qué correo te puedo enviar su portafolio actualizado?\"\n\nPASO 3: MANEJO DE PREGUNTAS.\nSi el usuario pregunta algo en lugar de dar su correo, responde de forma muy breve usando la BASE DE CONOCIMIENTO y vuelve a repetir la petición del PASO 2.\n\nEjemplo: \"Cristian es un Data Scientist experto en IA. La mejor forma de ver su trabajo es en su portafolio. ¿A qué correo te gustaría que te lo envíe?\"\n\n### REGLAS PARA USAR LA HERRAMIENTA SendEmail\nCONDICIÓN DE USO: Debes usar esta herramienta SI Y SOLO SI el usuario proporciona una dirección de correo electrónico.\n\nEXTRACCIÓN DE PARÁMETROS: Del mensaje del usuario, extrae únicamente la dirección de correo electrónico.\n\nMAPEADO DE PARÁMETROS: El correo extraído DEBE ser asignado al parámetro email de la herramienta.\n\nCONFIRMACIÓN POST-EJECUCIÓN: Después de que la herramienta se ejecute, informa al usuario del éxito.\n\nEjemplo: \"¡Perfecto! Acabo de enviar el portafolio a [correo del usuario]. Debería llegarte en breve.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "cca7da5a-6c43-468f-9950-c9eeb2bc98df",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "78078cd7-5298-4404-8027-95430eeecb06",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JHCSbh1Z1J7eN33p",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.reply ?? $json.text ?? JSON.stringify($json)\n\n",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "charset",
+                "value": "utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        0
+      ],
+      "id": "e36ec14d-8666-48eb-b4c6-cf46dc8fb565",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fromEmail": "tuprofeestadistica@gmail.com",
+        "toEmail": "={{ $('Webhook').item.json.body.message }}",
+        "subject": "Cristian - Estadístico Portafolio n8n",
+        "emailFormat": "text",
+        "text": "Hola le Saluda Cristian desde Mérida y este es mi portafolio de n8n\n\nhttps://github.com/estadistico/trabajos_n8n\ny otros trabajos por acá\nhttps://github.com/estadistico\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSendTool",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        192
+      ],
+      "id": "bdaef206-e500-4de7-90cc-f3e1dd7fb684",
+      "name": "Sendemail",
+      "webhookId": "54525753-e0f3-44fd-9515-7d131b203802",
+      "credentials": {
+        "smtp": {
+          "id": "u7LPBtGDEEAypL6t",
+          "name": "SMTP account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.conversationId }}",
+        "contextWindowLength": 4
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "e53888ca-7e96-43b9-8150-7ac9cfb9958b",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sendemail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "34ee18a7-dcd2-4197-9822-2fd68600986d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e90ec0eee6ecaf35c6e2e497cf8abb613fb760a20bec82a5acc921077fc11114"
+  },
+  "id": "9d9BQy42CodcfVwB",
+  "tags": []
+}

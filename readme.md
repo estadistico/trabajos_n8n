@@ -8,12 +8,9 @@ A continuación se detallan los proyectos y los archivos que los componen:
 
 * ### 00. Asistente de Portafolio (Cris-Bot)
     Acceder desde tuprofeanalitica.com/chatbot un asistente conversacional completo que he desarrollado y desplegado en un entorno de **producción**, accesible públicamente. El chatbot, llamado **Cris-Bot**, integra frontend, backend y un robusto flujo de automatización que permite a los visitantes de mi web solicitar mi portafolio directamente por correo electrónico. La solución gestiona la conversación de forma autónoma, utiliza **memoria** para mantener el contexto y ejecuta **tools** específicas para el envío de la información, demostrando mi capacidad para llevar un proyecto de IA de la concepción al despliegue.
-    * `CrisBot00.json`
-    * `CrisBotTool00.json`
+    * `intenziaprueba00.json`
+  Se usa la api de gemini y la configuracion de STM de google para el gmail  
 
-* ### 01. Smart Concierge
-    Un servicio de conserje virtual que gestiona solicitudes de usuarios (ej. itinerarios de viaje). Utiliza un agente de IA con memoria para ofrecer respuestas contextuales y fluidas.
-    * `Smart01.json`
 
 * ### 02. Asistente de Belleza
     Un asistente inteligente que ofrece recomendaciones personalizadas de productos y estilos, consultando el perfil del usuario y una base de datos de productos.
